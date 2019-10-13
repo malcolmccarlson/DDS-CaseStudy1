@@ -1,0 +1,97 @@
+---
+title: "casestudy1"
+author: "Malcolm Carlson"
+date: "10/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(magrittr)
+library(tidyr)
+library(plyr)
+library(dplyr)
+library(tidyverse)
+
+
+beerdf=read.csv("C:\\Users\\malco\\Documents\\MDS\\MDS_6306_DDS\\CaseStudy1\\Beers.csv",header=TRUE)
+breweriesdf=read.csv("C:\\Users\\malco\\Documents\\MDS\\MDS_6306_DDS\\CaseStudy1\\Breweries.csv",header=TRUE)
+#IBU - International Bitterness Units
+#ABV - Alcohol by Volume
+
+head(breweriesdf) 
+#Brew_ID,Name,City,State
+breweriesdf <- breweriesdf %>% rename(
+  Brewery_id = Brew_ID,
+  Brewery_name = Name
+)
+head(breweriesdf)
+
+head(beerdf)
+beerdf <- beerdf %>% rename(
+  Beer_name = Name
+)
+head(beerdf)
+```
+
+```{r}
+combineddf<-merge(breweriesdf,beerdf, by="Brewery_id",all = TRUE)
+
+head(combineddf)
+```
+#1. How many breweries are present in each state?
+```{r}
+combineddf%>%group_by(State)%>%summarise(count=n())
+#need a bar chart in descending order
+combineddf%>%ggplot(aes(x=State,fill=State))+geom_bar()
+```
+#3. Address the missing values in each column.
+```{r}
+
+sum(is.na(combineddf$Brewery_id))
+sum(is.na(combineddf$Brewery_name))
+sum(is.na(combineddf$City))
+sum(is.na(combineddf$State))
+sum(is.na(combineddf$Beer_name))
+sum(is.na(combineddf$Beer_ID))
+sum(is.na(combineddf$Style))
+sum(is.na(combineddf$Ounces))
+sum(is.na(combineddf$ABV))
+sum(is.na(combineddf$IBU))
+
+str(combineddf)
+head(combineddf,1)
+
+
+```
+#4. Compute the median alcohol content and international #bitterness unit for each state. Plot a bar chart to compare. ABV
+```{r}
+medianABVIBU<-combineddf%>%group_by(State)%>%summarize(medianABV=median(ABV),medianIBU=median(IBU))
+medianABVIBU
+
+
+```
+#5. Which state has the maximum alcoholic (ABV) beer? Which #state has the most bitter (IBU) beer?
+```{r}
+sortedbyIBU=medianABVIBU[order(-medianABVIBU$medianIBU),]
+sortedbyABV=medianABVIBU[order(-medianABVIBU$medianABV),]
+head(sortedbyABV)
+```
+#6. Comment on the summary statistics and distribution of the #ABV variable.
+```{r}
+
+
+```
+#7. Is there an apparent relationship between the bitterness #of the beer and its alcoholic content? Draw a scatter plot.  #Make your best judgment of a relationship and EXPLAIN your #answer.
+```{r}
+
+
+```
+#8.  Use KNN - For final presentation
+```{r}
+
+```
+#9.  Look at, have a direction!
