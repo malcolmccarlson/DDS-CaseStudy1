@@ -350,7 +350,7 @@ library(caret)
 library(e1071)
 
 styleSubset <- nona%>%select(Style,ABV,IBU)
-beermatch <- c("IPA","India Pale Ale","Ale")
+beermatch <- c("IPA","Ale")
 allAles <-styleSubset[grep(paste(beermatch,collapse="|"),styleSubset$Style,ignore.case = TRUE),]
 
 allAles$styleClass <- ifelse(grepl("IPA", allAles$Style,ignore.case = T), "IPA",
@@ -359,7 +359,7 @@ allAles$styleClass <- as.vector(unlist(allAles$styleClass))
 
 set.seed(6)
 perc=.8
-numks = 90
+numks = 30
 
 iterations=100
 masterAcc = matrix(nrow = iterations, ncol = numks)
@@ -368,6 +368,7 @@ masterSpecificity = matrix(nrow = iterations)
 
 for(j in 1:iterations)
 {
+ accs = data.frame(accuracy=numeric(30),k=numeric(30))
  trainIndices = sample(1:dim(allAles)[1],
  round(perc * dim(allAles)[1]))
  train = allAles[trainIndices,]
@@ -392,6 +393,17 @@ which.max(MeanAcc)
 MeanSpec
 MeanSens
 CM
+
+Percent_ABV=allAles$ABV*100
+gg <- ggplot(allAles, aes(x=ABV, y=IBU,col=styleClass)) +
+ geom_point(aes(fill=Percent_ABV)) +
+ geom_smooth(method="loess", se=F) +
+ labs(subtitle="ABV Vs IBU",
+      y="IBU",
+      x="ABV",
+      title="Scatterplot of Ales",
+      caption = "Source: Brewery Data")
+plot(gg)
 ```
 
 ## *Placeholder for boundary plot*
