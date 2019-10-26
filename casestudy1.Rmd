@@ -1,7 +1,7 @@
 ---
 title: "Craft Beer Case Study"
 author: "Malcolm Carlson"
-date: "10/24/2019"
+date: "10/26/2019"
 output: html_document
 runtime: shiny
 ---
@@ -9,9 +9,10 @@ runtime: shiny
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r imports}
-library(magrittr)
+```{r}
+
 library(tidyverse)
+library(magrittr)
 library(mice)
 library(usmap)
 library(ggplot2)
@@ -19,16 +20,17 @@ library(stringr)
 library(data.table)
 library(webdriver)
 ```
-# CSV reading and cleaning
-## Code below is to read in Beers.csv and Breweries.csv and count up the na's.
-```{r readsandmerges}
+## CSV reading and cleaning
+### *Code below is to read in Beers.csv and Breweries.csv and count up the na's.*
+```{r}
 beerdf=read.csv("C:\\Users\\malco\\Documents\\MDS\\MDS_6306_DDS\\CaseStudy1\\Beers.csv",header=TRUE)
 breweriesdf=read.csv("C:\\Users\\malco\\Documents\\MDS\\MDS_6306_DDS\\CaseStudy1\\Breweries.csv",header=TRUE)
 
 ```
-# ** Question 1.  How many breweries are present in each state?
-## * With the merged data above, we grouped by state, then did a count on the Brewery factor which gives us a total brewery count by state.
-```{r question1}
+
+# **Question 1.  How many breweries are present in each state?**
+# *With the breweriesdf dataframe, we grouped by state, then did a count on the Brewery factor which gives us a total brewery count by state.*
+```{r}
 #Created for data in ascending order
 set.seed(6)
 stateSum=breweriesdf%>%group_by(State)%>%summarise(Brewery_count=n())
@@ -43,9 +45,10 @@ top10%>%ggplot(aes(x=reorder(State,-Brewery_count),y=Brewery_count))+
   ggtitle("Top 10 States with most Breweries")+xlab("States")+ylab("Count of Breweries")
 
 ```
-# **2. Merge beer data with the breweries data. Print first and last 6 observations.
-## * Before merging, we renamed Brew_ID and name to Brewery_id,Brewery_name in Breweriesdf.  In Beers, we renamed Name to Beer_name to avoid conflicts.
-```{r question2}
+
+# **2. Merge beer data with the breweries data. Print first and last 6 observations.**
+## *Before merging, we renamed Brew_ID and name to Brewery_id,Brewery_name in Breweriesdf.  In Beers, we renamed Name to Beer_name to avoid conflicts.*
+```{r}
 breweriesdf <- breweriesdf %>% rename(
     Brewery_id = Brew_ID,
     Brewery_name = Name)
@@ -63,22 +66,23 @@ sum(is.na(combineddf$ABV))
 sum(is.na(combineddf$IBU))
 ```
 
-# **3.  Address the missing values in each column.
-## * We chose the mice library to address missing values in ABV and IBU. We imputed using all but the predm columns to create the new values.
-```{r questin3}
-#init = mice(combineddf, maxit=0)
-#predM = init$predictorMatrix
-#predM[, c("Beer_name", "Beer_ID", "Ounces", "Brewery_name")]=0
-#imp<-mice(combineddf, m=5, predictorMatrix = predM)
-#nona <- complete(imp)
-#nona$State<-trimws(nona$State)
-#write.csv(nona,file="/Users/malco/Documents/MDS/MDS_6306_DDS/CaseStudy1/nona.csv",row.names=FALSE)
+# **3.  Address the missing values in each column.**
+## *We chose the mice library to address missing values in ABV and IBU. We imputed using all but the predm columns to create the new values. We then wrote out the finished data set with imputed data to a .csv so it could be read in for the rest of the code to reduce run time.*
+```{r}
+init = mice(combineddf, maxit=0)
+predM = init$predictorMatrix
+predM[, c("Beer_name", "Beer_ID", "Ounces", "Brewery_name")]=0
+imp<-mice(combineddf, m=5, predictorMatrix = predM)
+nona <- complete(imp)
+nona$State<-trimws(nona$State)
+write.csv(nona,file="/Users/malco/Documents/MDS/MDS_6306_DDS/CaseStudy1/nona.csv",row.names=FALSE)
 nona=read.csv(file="/Users/malco/Documents/MDS/MDS_6306_DDS/CaseStudy1/nona.csv",header=TRUE)
 
 ```
-# **4. Compute the median alcohol content and international bitterness #unit for each state. Plot a bar chart to compare. ABV,IBU.
-## *The State column data in the nona data frame had a space that had to be removed with str_trim.  A new df was created for the median values for both ABV and IBU. The dataframe was then ordered to create a top 10 list and bar chart of both ABV and IBU.
-```{r question4}
+
+# **4. Compute the median alcohol content and international bitterness #unit for each state. Plot a bar chart to compare. ABV,IBU.**
+## *The State column data in the nona data frame had a space that had to be removed with str_trim.  A new df was created for the median values for both ABV and IBU. The dataframe was then ordered to create a top 10 list and bar chart of both ABV and IBU.*
+```{r}
 nona$State = as.character(nona$State)
 nona$State = str_trim(nona$State)
 
@@ -93,32 +97,22 @@ top10medABV%>%ggplot(aes(x=reorder(State,-medianABV),y=medianABV))+
 ggtitle("Highest Median Alcohol by Volumes by State")+xlab("States")+ylab("Alcohol by Volume")
 
 ```
----
-title: "Question 5. Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?"
-output: html_document
-runtime: shiny
----
-# **5. Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?
-## *Colorado had the highest ABV and IBU values.  The maxABV and maxIBU containe the top state value. 
+
+# **5. Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?**
+## *Colorado had the highest ABV and IBU values.  The maxABV and maxIBU containe the top state value.*
 ```{r}
 #Code to selct by ABV and IBU and find max value
-maxABV<-nona%>%group_by(State)%>%select(State,ABV)
-maxIBU<-nona%>%group_by(State)%>%select(State,IBU)
+maxABV<-nona%>%group_by(State)
+maxIBU<-nona%>%group_by(State)
 maxABV[which.max(maxABV$ABV), ]
 maxIBU[which.max(maxIBU$IBU), ]
 
 ```
----
-title: "Question 6. Comment on the summary statistics and distribution of the ABV variable."
-output: html_document
-runtime: shiny
----
-# **6. Comment on the summary statistics and distribution of the ABV variable.
-## *The justABV variable holds only the ABV data.  That is used to plot the raw data histogram for Alcohol by volume for the entire population. The standard hist() was used to create a simple plot with a normal curve.
-```{r}
-justABV<-nona%>%select(ABV)
 
-x <- justABV$ABV
+# **6. Comment on the summary statistics and distribution of the ABV variable.**
+## *The justABV variable holds only the ABV data.  That is used to plot the raw data histogram for Alcohol by volume for the entire sample population. The standard hist() was used to create a simple plot with a normal curve.*
+```{r}
+x <- nona$ABV
 h<-hist(x,
      main="Histogram of Alcohol by Volume",
      xlab="Alcohol by Volume",
@@ -132,28 +126,26 @@ yfit <- yfit*diff(h$mids[1:2])*length(x)
 lines(xfit, yfit, col="blue", lwd=2)
 
 ```
-## *The summary(justABV) was used to create the summary statistics and a box plot using ggplot. 
+
+## *The summary(justABV) was used to create the summary statistics and a box plot using ggplot. *
 ```{r}
-summary(justABV)
-justABV%>%ggplot(aes(x="", y=ABV,fill=ABV))+geom_boxplot(width=.4,fill="lightblue")+ylab("ABV")+ggtitle("Box plot of ABV Summary Statistics")
+justABV<-nona%>%select(ABV)
+summary(justABV*100)
+justABV%>%ggplot(aes(x="", y=ABV,fill=ABV))+geom_boxplot(width=.4,fill="lightblue")+ylab("ABV")+ggtitle("Box plot of ABV Summary Statistics")+xlab(NULL)
 
 ```
----
-title: "IBU Summary data and boxplot"
-output: html_document
-runtime: shiny
----
-## *justIBU was used to capture summary statistics for IBU including a boxplot.
-```{r ibusummarybox}
+
+## *justIBU was used to capture summary statistics for IBU including a boxplot.*
+```{r}
 justIBU<-nona%>%select(IBU)
 summary(justIBU)
 justIBU%>%ggplot(aes(x="", y=IBU,fill=IBU))+geom_boxplot(width=.4,fill="lightblue")+ylab("IBU")+ggtitle("Box plot of IBU Summary Statistics")
 
 ```
-# **7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.  Make your best judgment of a relationship and EXPLAIN your answer.  
-## *The scatter plots for this data was not conclusive and difficult to see patterns. This question is addressed further down.
 
-```{r question7}
+# **7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.  Make your best judgment of a relationship and EXPLAIN your answer.**
+## *The scatter plots for this data was not conclusive and difficult to see patterns. This question is addressed further down.*
+```{r}
 qplot(seq_along(nona$ABV),nona$ABV,main="Scatter Plot of ABV",xlab="ABV")
 qplot(seq_along(nona$IBU),nona$IBU, main="Scatter Plot of IBU",xlab="IBU")
 
@@ -162,8 +154,8 @@ styledf%>%ggplot(aes(x=ABV,y=IBU,color=State))+geom_point()+ggtitle("ABV vs IBU"
 
 ```
 
-## *Jason's code to support usmap libary
-```{r usmapplot}
+## *Jason's code to support usmap libary.  This code was modified to include a sum of breweries by state.  That new column was later used to show a us map of number of breweries by state.*
+```{r}
 statesum = count(nona, vars = State)
 brewerysum=breweriesdf%>%group_by(State)%>%summarise(Brewery_count=n())
 
@@ -180,38 +172,39 @@ statebrew <- merge(brewerysum, statebrew, by.x = "State", by.y  = "abbr")
 
 ```
 
-# **1.cont US map of breweries by state.
-## *This map shows the number of breweries accross all the states. The usmap library was used for these maps.
-```{r breweriesbystate}
+# **1.(continued) US map of breweries by state.**
+## *This map shows the number of breweries accross all the states. The usmap library was used for these maps.*
+```{r}
 plot_usmap(data = statebrew, values = "Brewery_count", color = "red") + 
   scale_fill_continuous(name = "Craft Breweries by State", label = scales::comma) + 
   theme(legend.position = "right")
 ```
 
-## *US Maps plot of craft beers by state using the usmap library
-```{r beersbystate}
+## *US Maps plot of craft beers by state using the usmap library*
+```{r}
 plot_usmap(data = statebrew, values = "count", color = "red") + 
   scale_fill_continuous(name = "Beers by State", label = scales::comma) + theme(legend.position = "right")
 ```
 
-## *States population div by beers using the usmap library.
-```{r popdivbeers}
+## *States population div by beers using the usmap library.*
+```{r}
 plot_usmap(data = statebrew, values = "per_cap", color = "black") + 
   scale_fill_continuous(
     low = "white", high = "darkblue", name = "States Population div by beers", label = scales::comma
   ) + theme(legend.position = "right")
 ```
 
-## *Removed n/a's from the data merged data to one master data frame
-```{r onemaster}
+## *Removed n/a's and merged data to one master data frame*
+```{r}
 nona$State = as.character(nona$State)
 nona$State = str_trim(nona$State)
 
 allbrews = merge(statebrew, nona, by.x = "State", by.y = "State")
 head(allbrews)
 ```
-## *Compute the ABV,IBU state stats used for usmap plots.
-```{r abvibustats}
+
+## *Compute the ABV,IBU state stats used for usmap plots.*
+```{r}
 
 stateABV = allbrews %>%
   group_by(State) %>%
@@ -228,48 +221,51 @@ stateABV = merge(temp, stateABV, by.x = "abbr", by.y = "State")
 stateIBU = merge(temp, stateIBU, by.x = "abbr", by.y = "State")
 
 ```
-## *Map of ABV by state
-```{r mapabvstate}
+
+## *Map of ABV by state*
+```{r}
 plot_usmap(data = stateABV, values = "median", color = "black") + scale_fill_continuous(low = "white", high = "blue", name = "ABV % by State"  ) + theme(legend.position =
 "right")
 ```
-## *Map of IBU by state
-```{r mapibustate}
+
+## *Map of IBU by state*
+```{r}
 plot_usmap(data = stateIBU, values = "median", color = "black") + 
   scale_fill_continuous(
     low = "blue", high = "white", name = "IBU by State"  ) + theme(legend.position = "right")
 
 ```
 
-# **5.cont for ABV
-## *Using usmaps to generate state of colorado with ABV %.
-```{r highestabvstate}
+# **5.cont for ABV**
+## *Using usmaps to generate state of colorado with ABV %.*
+```{r}
 plot_usmap(data = stateABV, values = "max", include = "CO", color = "red") + labs(title = "Colorado") +
   scale_fill_continuous(
     low = "white", high = "midnightblue", name = "ABV %"  ) + theme(legend.position = "right")
 
 ```
-# **5.cont for IBU
-## *Using usmaps to generate state of colorado with IBU.
-```{r highestibustate}
+
+# **5.cont for IBU**
+## *Using usmaps to generate state of colorado with IBU.*
+```{r}
 plot_usmap(data = stateIBU, values = "max", include = "CO", color = "red") + labs(title = "Colorado") +
   scale_fill_continuous(
     low = "white", high = "midnightblue", name = "IBU"  ) + theme(legend.position = "right")
 
 ```
 
-## **7. Linear regression analysis
-# *Linear regression of ABV and IBU with raw data to see if ther is a relationship.
-```{r q7linearregression}
+## **7. Linear regression analysis**
+# *Linear regression of ABV and IBU with raw data to see if ther is a relationship.*
+```{r}
 nona%>%ggplot(aes(x=ABV,y=IBU))+geom_point()+geom_smooth(method="lm")
 
 fit = lm(IBU~ABV, data = nona) 
 summary(fit)
 ```
 
-# **Jason's beer style code for Q7
-## *This code creates a class for beer Styles to make analysis easier and to enable the plot dot plot used to describe the relationship between style and ABV and IBU
-```{r beerstyle}
+# **Jason's beer style code for Q7**
+## *This code creates a class for beer Styles to make analysis easier and to enable the dot plot used to describe the relationship between style and ABV and IBU*
+```{r}
 
 styles = c("IPA", "APA", "Blonde ale", "brown ale", "red ale", "ale", "lager", "stout", "cider", "porter", "pilsner", "hefeweizen" ,"pilsener", "witbier", "fruit", "KÃ¶lsch")
 beers = data.frame(styles)
@@ -298,8 +294,9 @@ for (i in 1:dim(allbrews)[1]) {
 }    
 
 ```
-## *The dot plot of the relationship between Styles of beer and their ABV and IBU along with a measure of popularity by looking at total populations of the beer style classifications. This plot shows the popularity of IPA's along with their high ABV and IBU score.
-```{r plotbeerstyle}
+
+## *The dot plot of the relationship between Styles of beer and their ABV and IBU along with a measure of popularity by looking at total populations of the beer style classifications. This plot shows the popularity of IPA's along with their high ABV and IBU score.  This plot gives us information about beer style popularity and it's corresponding ABV and IBU.*
+```{r}
 
 stylesum = count(allbrews, vars = class) 
 stylemeans = stylesum
@@ -343,29 +340,31 @@ gg <- ggplot(stylemeans, aes(x=ABVmean, y=IBUmean)) +
 plot(gg)
 
 ```
-# **8. Use KNN - For final presentation. Budweiser would also like to investigate the difference with respect #to IBU and ABV between IPAs (India Pale Ales) and other types of Ale (any beer with “Ale” in its name other than IPA). Classify IPA vs Regular Ale by ABV and IBU.
-## *KNN was used to classify all ales into either IPA or Ale using ABV and IBU.  A training set and test set were created (80/20) and 60 values of k were used to determine the best k value for this model which is 7.
-```{r question8knn}
-library(stringr)
+
+# **8. Use KNN - For final presentation. Budweiser would also like to investigate the difference with respect #to IBU and ABV between IPAs (India Pale Ales) and other types of Ale (any beer with “Ale” in its name other than IPA). Classify IPA vs Regular Ale by ABV and IBU.**
+
+## *KNN was used to classify all ales into either IPA or Ale using ABV and IBU.  A training set and test set were created (80/20) and 90 values of k were tested over 100 iterations to determine the best k value for this model which is 5.*
+```{r}
 library(class)
 library(caret)
 library(e1071)
 
 styleSubset <- nona%>%select(Style,ABV,IBU)
-beermatch <- c("IPA","Ale","India Pale Ale")
+beermatch <- c("IPA","India Pale Ale","Ale")
 allAles <-styleSubset[grep(paste(beermatch,collapse="|"),styleSubset$Style,ignore.case = TRUE),]
 
-allAles$styleClass <- ifelse(grepl("IPA", allAles$Style,ignore.case = T), "IPA", 
-         ifelse(grepl("Ale", allAles$Style, ignore.case = T), "Ale", "Ale"))
+allAles$styleClass <- ifelse(grepl("IPA", allAles$Style,ignore.case = T), "IPA",
+  ifelse(grepl("Ale", allAles$Style, ignore.case = T), "Ale", "Ale"))
 allAles$styleClass <- as.vector(unlist(allAles$styleClass))
 
 set.seed(6)
 perc=.8
-numks = 60
+numks = 90
 
 iterations=100
-#accs = data.frame(accuracy = numeric(iterations), k = numeric(iterations))
 masterAcc = matrix(nrow = iterations, ncol = numks)
+masterSensitivity = matrix(nrow = iterations)
+masterSpecificity = matrix(nrow = iterations)
 
 for(j in 1:iterations)
 {
@@ -380,33 +379,34 @@ for(j in 1:iterations)
   table(classifications,test$styleClass)
   CM = confusionMatrix(table(classifications,test$styleClass))
   masterAcc[j,i] = CM$overall[1]
+  masterSensitivity[j]=CM$byClass[1]
+  masterSpecificity[j]=CM$byClass[2]
   }
 }
-
+ptitle=print(paste0(numks," values of K for ",iterations," iterations."))
 MeanAcc = colMeans(masterAcc)
-plot(seq(1,numks,1),MeanAcc, type = "l")
+MeanSpec = mean(masterSpecificity)
+MeanSens = mean(masterSensitivity)
+plot(seq(1,numks,1),MeanAcc, type = "l",xlab = "Values of K",ylab = "Accuracy",main = ptitle)
 which.max(MeanAcc)
-max(MeanAcc)
+MeanSpec
+MeanSens
 CM
-
 ```
-## *Placeholder for boundary plot
-```{r knnboundryplot}
-#Data covering grid
-require(MASS)
+
+## *Placeholder for boundary plot*
+```{r}
+library(ElemStatLearn)
+require(class)
 
 
 ```         
----
-title: "Question 9. Display regions of the US and see if there is a trend to the type of beer and/or alcohol content. .northeast_region"
-output: html_document
-runtime: shiny
----
-# **9. Question of interest:  What are the most popular beer styles by region of the country.  
-## *This information will be valuable in targeting the correct regional markets for expansion, possibly investing in local breweries to capitalize on certain style popularity outside of Budweizer's core business.  The next regional plots are broken into four major regions with a top ten list of most popular beer styles.
 
-# **North Eastern Region
-```{r question9neregion}
+# **9. Question of interest:  What are the most popular beer styles by region of the country.**
+## *This information will be valuable in targeting the correct regional markets for expansion, possibly investing in local breweries to capitalize on certain style popularity outside of Budweizer's core business.  The next regional plots are broken into four major regions with a top ten list of most popular beer styles.*
+
+## **North Eastern Region**
+```{r}
 nestates=c("CT","MA","ME","NH","RI","VT","NJ","NY","PA")
 neregion <- allbrews%>%filter(State %in% nestates) 
 classCount=neregion%>%group_by(class)%>%summarise(class_count=n())
@@ -415,8 +415,9 @@ orderedcc<-classCount[order(-classCount$class_count),]
 plot_usmap(fill="blue",color = "black", include = .northeast_region)
 head(orderedcc)
 ```
-# **Midwest Region
-```{r q9mwregion}
+
+## **Midwest Region**
+```{r}
 mwstate=c("IL","IN","MI","OH","WI","IA","KS","MN","MO","NE","ND","SD")
 mwregion <- allbrews%>%filter(State %in% mwstate)
 
@@ -426,8 +427,9 @@ orderedcc<-classCount[order(-classCount$class_count),]
 plot_usmap(fill="blue",color = "black", include = .midwest_region)
 head(orderedcc)
 ```
-# **South Region
-```{r q9sregion}
+
+## **South Region**
+```{r}
 sstates=c("DC","DE","FL","GA","MD","NC","SC","VA","WV","AL","KY","MS" ,"TN","AR","LA","OK","TX")
 sregion <- allbrews%>%filter(State %in% sstates)
 classCount=sregion%>%group_by(class)%>%summarise(class_count=n())
@@ -436,8 +438,9 @@ orderedcc<-classCount[order(-classCount$class_count),]
 plot_usmap(fill="blue",color = "black", include = .south_region)
 head(orderedcc)
 ```
-# **West Region
-```{r q9wregion}
+
+## **West Region**
+```{r}
 wstates=c("AZ","CO","ID","MT","NV","NM","UT","WY","AK","CA","HI","OR" ,"WA")
 wregion <- allbrews%>%filter(State %in% wstates)
 classCount=wregion%>%group_by(class)%>%summarise(class_count=n())
