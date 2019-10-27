@@ -80,7 +80,7 @@ nona=read.csv(file="/Users/malco/Documents/MDS/MDS_6306_DDS/CaseStudy1/nona.csv"
 
 ```
 
-# **4. Compute the median alcohol content and international bitterness #unit for each state. Plot a bar chart to compare. ABV,IBU.**
+# **4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare. ABV,IBU.**
 ## *The State column data in the nona data frame had a space that had to be removed with str_trim.  A new df was created for the median values for both ABV and IBU. The dataframe was then ordered to create a top 10 list and bar chart of both ABV and IBU.*
 ```{r}
 nona$State = as.character(nona$State)
@@ -88,14 +88,19 @@ nona$State = str_trim(nona$State)
 
 #Dataframe of just State,ABV,IBU
 medianABVIBU<-nona%>%group_by(State)%>%summarize(medianABV=median(ABV),medianIBU=median(IBU))
-head(medianABVIBU)
 
 #Code for Top 10 highes ABV by State                          
 top10medABV=head(medianABVIBU,10)
 top10medABV%>%ggplot(aes(x=reorder(State,-medianABV),y=medianABV))+
   geom_bar(stat="identity",fill="blue")+geom_text(aes(label=medianABV), vjust=1.6, color="white", size=3)+
-ggtitle("Highest Median Alcohol by Volumes by State")+xlab("States")+ylab("Alcohol by Volume")
+ggtitle("Top 10 Highest Median Alcohol by Volumes by State")+xlab("States")+ylab("Alcohol by Volume")
+top10medABV[order(-top10medABV$medianABV),]
 
+top10medIBU=head(medianABVIBU,10)
+top10medIBU%>%ggplot(aes(x=reorder(State,-medianIBU),y=medianIBU))+
+  geom_bar(stat="identity",fill="blue")+geom_text(aes(label=medianIBU), vjust=1.6, color="white", size=3)+
+ggtitle("Top 10 Highest Median International Bitterness Units by State")+xlab("States")+ylab("Alcohol by Volume")
+top10medIBU[order(-top10medIBU$medianIBU),]
 ```
 
 # **5. Which state has the maximum alcoholic (ABV) beer? Which state has the most bitter (IBU) beer?**
@@ -394,9 +399,14 @@ MeanSpec
 MeanSens
 CM
 
+
+```
+
+## *Scatter plot of Ale vs IPA beer styles*
+```{r}
 Percent_ABV=allAles$ABV*100
 gg <- ggplot(allAles, aes(x=ABV, y=IBU,col=styleClass)) +
- geom_point(aes(fill=Percent_ABV)) +
+ geom_point(aes()) +
  geom_smooth(method="loess", se=F) +
  labs(subtitle="ABV Vs IBU",
       y="IBU",
@@ -404,15 +414,10 @@ gg <- ggplot(allAles, aes(x=ABV, y=IBU,col=styleClass)) +
       title="Scatterplot of Ales",
       caption = "Source: Brewery Data")
 plot(gg)
+
+
 ```
 
-## *Placeholder for boundary plot*
-```{r}
-library(ElemStatLearn)
-require(class)
-
-
-```         
 
 # **9. Question of interest:  What are the most popular beer styles by region of the country.**
 ## *This information will be valuable in targeting the correct regional markets for expansion, possibly investing in local breweries to capitalize on certain style popularity outside of Budweizer's core business.  The next regional plots are broken into four major regions with a top ten list of most popular beer styles.*
@@ -424,8 +429,14 @@ neregion <- allbrews%>%filter(State %in% nestates)
 classCount=neregion%>%group_by(class)%>%summarise(class_count=n())
 orderedcc<-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill="blue",color = "black", include = .northeast_region)
-head(orderedcc)
+plot_usmap(data = neregion, values = "IBU", color = "black", include = .northeast_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "IBU by State"  ) + theme(legend.position = "right")
+
+plot_usmap(data = neregion, values = "ABV", color = "black", include = .northeast_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "ABV by State"  ) + theme(legend.position = "right")
+
 ```
 
 ## **Midwest Region**
@@ -436,8 +447,13 @@ mwregion <- allbrews%>%filter(State %in% mwstate)
 classCount=mwregion%>%group_by(class)%>%summarise(class_count=n())
 orderedcc<-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill="blue",color = "black", include = .midwest_region)
-head(orderedcc)
+plot_usmap(data = mwregion, values = "IBU", color = "black", include = .midwest_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "IBU by State"  ) + theme(legend.position = "right")
+
+plot_usmap(data = mwregion, values = "ABV", color = "black", include = .midwest_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "ABV by State"  ) + theme(legend.position = "right")
 ```
 
 ## **South Region**
@@ -447,8 +463,14 @@ sregion <- allbrews%>%filter(State %in% sstates)
 classCount=sregion%>%group_by(class)%>%summarise(class_count=n())
 orderedcc<-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill="blue",color = "black", include = .south_region)
-head(orderedcc)
+plot_usmap(data = sregion, values = "IBU", color = "black", include = .south_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "IBU by State"  ) + theme(legend.position = "right")
+
+plot_usmap(data = sregion, values = "ABV", color = "black", include = .south_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "ABV by State"  ) + theme(legend.position = "right")
+
 ```
 
 ## **West Region**
@@ -458,6 +480,12 @@ wregion <- allbrews%>%filter(State %in% wstates)
 classCount=wregion%>%group_by(class)%>%summarise(class_count=n())
 orderedcc<-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill="blue",color = "black", include = .west_region)
-head(orderedcc)
+plot_usmap(data = wregion, values = "IBU", color = "black", include = .west_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "IBU by State"  ) + theme(legend.position = "right")
+
+plot_usmap(data = wregion, values = "ABV", color = "black", include = .west_region) + 
+  scale_fill_continuous(
+    low = "blue", high = "white", name = "ABU by State"  ) + theme(legend.position = "right")
+
 ```

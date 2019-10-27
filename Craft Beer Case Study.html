@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0036)http://127.0.0.1:4331/casestudy1.Rmd -->
+<!-- saved from url=(0036)http://127.0.0.1:4846/casestudy1.Rmd -->
 <html class=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
   
@@ -11,7 +11,7 @@
 <script src="./Craft Beer Case Study_files/shiny.min.js.download"></script>  <script src="./Craft Beer Case Study_files/rmd_loader.js.download"></script>
   <link href="./Craft Beer Case Study_files/rmd_loader.css" rel="stylesheet">
 
-<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" type="text/css" href="./Craft Beer Case Study_files/bootstrap.min.css"><script src="./Craft Beer Case Study_files/bootstrap.min.js.download"></script><script src="./Craft Beer Case Study_files/html5shiv.min.js.download"></script><script src="./Craft Beer Case Study_files/respond.min.js.download"></script><script src="./Craft Beer Case Study_files/tabsets.js.download"></script><link rel="stylesheet" type="text/css" href="./Craft Beer Case Study_files/default.css"><script src="./Craft Beer Case Study_files/highlight.js.download"></script><link rel="stylesheet" type="text/css" href="./Craft Beer Case Study_files/rmd_perf.css"><script src="./Craft Beer Case Study_files/rmd_perf.js.download"></script><meta name="rstudio_origin" content="127.0.0.1:32636"><script src="./Craft Beer Case Study_files/rsiframe.js.download"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" type="text/css" href="./Craft Beer Case Study_files/bootstrap.min.css"><script src="./Craft Beer Case Study_files/bootstrap.min.js.download"></script><script src="./Craft Beer Case Study_files/html5shiv.min.js.download"></script><script src="./Craft Beer Case Study_files/respond.min.js.download"></script><script src="./Craft Beer Case Study_files/tabsets.js.download"></script><link rel="stylesheet" type="text/css" href="./Craft Beer Case Study_files/default.css"><script src="./Craft Beer Case Study_files/highlight.js.download"></script><link rel="stylesheet" type="text/css" href="./Craft Beer Case Study_files/rmd_perf.css"><script src="./Craft Beer Case Study_files/rmd_perf.js.download"></script><meta name="rstudio_origin" content="127.0.0.1:37464"><script src="./Craft Beer Case Study_files/rsiframe.js.download"></script>
 
 
 
@@ -399,7 +399,7 @@ nona=read.csv(file=<span class="hljs-string">"/Users/malco/Documents/MDS/MDS_630
 </div>
 </div>
 <div id="section-compute-the-median-alcohol-content-and-international-bitterness-unit-for-each-state.-plot-a-bar-chart-to-compare.-abvibu." class="section level1">
-<h1><strong>4. Compute the median alcohol content and international bitterness #unit for each state. Plot a bar chart to compare. ABV,IBU.</strong></h1>
+<h1><strong>4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare. ABV,IBU.</strong></h1>
 <div id="section-the-state-column-data-in-the-nona-data-frame-had-a-space-that-had-to-be-removed-with-str_trim.-a-new-df-was-created-for-the-median-values-for-both-abv-and-ibu.-the-dataframe-was-then-ordered-to-create-a-top-10-list-and-bar-chart-of-both-abv-and-ibu." class="section level2">
 <h2><em>The State column data in the nona data frame had a space that had to be removed with str_trim. A new df was created for the median values for both ABV and IBU. The dataframe was then ordered to create a top 10 list and bar chart of both ABV and IBU.</em></h2>
 <pre class="r"><code class="hljs">nona$State = as.character(nona$State)
@@ -407,22 +407,46 @@ nona$State = str_trim(nona$State)
 
 <span class="hljs-comment">#Dataframe of just State,ABV,IBU</span>
 medianABVIBU&lt;-nona%&gt;%group_by(State)%&gt;%summarize(medianABV=median(ABV),medianIBU=median(IBU))
-head(medianABVIBU)</code></pre>
-<pre><code class="hljs">## # A tibble: 6 x 3
-##   State medianABV medianIBU
-##   &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 AK        0.056      40  
-## 2 AL        0.06       39.5
-## 3 AR        0.052      45  
-## 4 AZ        0.055      20  
-## 5 CA        0.058      47  
-## 6 CO        0.06       37</code></pre>
-<pre class="r"><code class="hljs"><span class="hljs-comment">#Code for Top 10 highes ABV by State                          </span>
+
+<span class="hljs-comment">#Code for Top 10 highes ABV by State                          </span>
 top10medABV=head(medianABVIBU,<span class="hljs-number">10</span>)
 top10medABV%&gt;%ggplot(aes(x=reorder(State,-medianABV),y=medianABV))+
   geom_bar(stat=<span class="hljs-string">"identity"</span>,fill=<span class="hljs-string">"blue"</span>)+geom_text(aes(label=medianABV), vjust=<span class="hljs-number">1.6</span>, color=<span class="hljs-string">"white"</span>, size=<span class="hljs-number">3</span>)+
-ggtitle(<span class="hljs-string">"Highest Median Alcohol by Volumes by State"</span>)+xlab(<span class="hljs-string">"States"</span>)+ylab(<span class="hljs-string">"Alcohol by Volume"</span>)</code></pre>
+ggtitle(<span class="hljs-string">"Top 10 Highest Median Alcohol by Volumes by State"</span>)+xlab(<span class="hljs-string">"States"</span>)+ylab(<span class="hljs-string">"Alcohol by Volume"</span>)</code></pre>
 <p><img src="./Craft Beer Case Study_files/unnamed-chunk-6-1.png" width="672"></p>
+<pre class="r"><code class="hljs">top10medABV[order(-top10medABV$medianABV),]</code></pre>
+<pre><code class="hljs">## # A tibble: 10 x 3
+##    State medianABV medianIBU
+##    &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+##  1 DE       0.0635      70  
+##  2 DC       0.0625      16  
+##  3 AL       0.06        39.5
+##  4 CO       0.06        37  
+##  5 CT       0.06        17  
+##  6 CA       0.058       47  
+##  7 AK       0.056       40  
+##  8 FL       0.0555      29.5
+##  9 AZ       0.055       20  
+## 10 AR       0.052       45</code></pre>
+<pre class="r"><code class="hljs">top10medIBU=head(medianABVIBU,<span class="hljs-number">10</span>)
+top10medIBU%&gt;%ggplot(aes(x=reorder(State,-medianIBU),y=medianIBU))+
+  geom_bar(stat=<span class="hljs-string">"identity"</span>,fill=<span class="hljs-string">"blue"</span>)+geom_text(aes(label=medianIBU), vjust=<span class="hljs-number">1.6</span>, color=<span class="hljs-string">"white"</span>, size=<span class="hljs-number">3</span>)+
+ggtitle(<span class="hljs-string">"Top 10 Highest Median International Bitterness Units by State"</span>)+xlab(<span class="hljs-string">"States"</span>)+ylab(<span class="hljs-string">"Alcohol by Volume"</span>)</code></pre>
+<p><img src="./Craft Beer Case Study_files/unnamed-chunk-6-2.png" width="672"></p>
+<pre class="r"><code class="hljs">top10medIBU[order(-top10medIBU$medianIBU),]</code></pre>
+<pre><code class="hljs">## # A tibble: 10 x 3
+##    State medianABV medianIBU
+##    &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+##  1 DE       0.0635      70  
+##  2 CA       0.058       47  
+##  3 AR       0.052       45  
+##  4 AK       0.056       40  
+##  5 AL       0.06        39.5
+##  6 CO       0.06        37  
+##  7 FL       0.0555      29.5
+##  8 AZ       0.055       20  
+##  9 CT       0.06        17  
+## 10 DC       0.0625      16</code></pre>
 </div>
 </div>
 <div id="section-which-state-has-the-maximum-alcoholic-abv-beer-which-state-has-the-most-bitter-ibu-beer" class="section level1">
@@ -738,7 +762,7 @@ plot(gg)</code></pre>
 <span class="hljs-keyword">library</span>(e1071)
 
 styleSubset &lt;- nona%&gt;%select(Style,ABV,IBU)
-beermatch &lt;- c(<span class="hljs-string">"IPA"</span>,<span class="hljs-string">"India Pale Ale"</span>,<span class="hljs-string">"Ale"</span>)
+beermatch &lt;- c(<span class="hljs-string">"IPA"</span>,<span class="hljs-string">"Ale"</span>)
 allAles &lt;-styleSubset[grep(paste(beermatch,collapse=<span class="hljs-string">"|"</span>),styleSubset$Style,ignore.case = <span class="hljs-literal">TRUE</span>),]
 
 allAles$styleClass &lt;- ifelse(grepl(<span class="hljs-string">"IPA"</span>, allAles$Style,ignore.case = <span class="hljs-literal">T</span>), <span class="hljs-string">"IPA"</span>,
@@ -747,7 +771,7 @@ allAles$styleClass &lt;- as.vector(unlist(allAles$styleClass))
 
 set.seed(<span class="hljs-number">6</span>)
 perc=<span class="hljs-number">.8</span>
-numks = <span class="hljs-number">90</span>
+numks = <span class="hljs-number">30</span>
 
 iterations=<span class="hljs-number">100</span>
 masterAcc = matrix(nrow = iterations, ncol = numks)
@@ -756,6 +780,7 @@ masterSpecificity = matrix(nrow = iterations)
 
 <span class="hljs-keyword">for</span>(j <span class="hljs-keyword">in</span> <span class="hljs-number">1</span>:iterations)
 {
+ accs = data.frame(accuracy=numeric(<span class="hljs-number">30</span>),k=numeric(<span class="hljs-number">30</span>))
  trainIndices = sample(<span class="hljs-number">1</span>:dim(allAles)[<span class="hljs-number">1</span>],
  round(perc * dim(allAles)[<span class="hljs-number">1</span>]))
  train = allAles[trainIndices,]
@@ -772,51 +797,60 @@ masterSpecificity = matrix(nrow = iterations)
   }
 }
 ptitle=print(paste0(numks,<span class="hljs-string">" values of K for "</span>,iterations,<span class="hljs-string">" iterations."</span>))</code></pre>
-<pre><code class="hljs">## [1] "90 values of K for 100 iterations."</code></pre>
+<pre><code class="hljs">## [1] "30 values of K for 100 iterations."</code></pre>
 <pre class="r"><code class="hljs">MeanAcc = colMeans(masterAcc)
 MeanSpec = mean(masterSpecificity)
 MeanSens = mean(masterSensitivity)
 plot(seq(<span class="hljs-number">1</span>,numks,<span class="hljs-number">1</span>),MeanAcc, type = <span class="hljs-string">"l"</span>,xlab = <span class="hljs-string">"Values of K"</span>,ylab = <span class="hljs-string">"Accuracy"</span>,main = ptitle)</code></pre>
 <p><img src="./Craft Beer Case Study_files/unnamed-chunk-25-1.png" width="672"></p>
 <pre class="r"><code class="hljs">which.max(MeanAcc)</code></pre>
-<pre><code class="hljs">## [1] 9</code></pre>
+<pre><code class="hljs">## [1] 5</code></pre>
 <pre class="r"><code class="hljs">MeanSpec</code></pre>
-<pre><code class="hljs">## [1] 0.7808901</code></pre>
+<pre><code class="hljs">## [1] 0.7445288</code></pre>
 <pre class="r"><code class="hljs">MeanSens</code></pre>
-<pre><code class="hljs">## [1] 0.852929</code></pre>
+<pre><code class="hljs">## [1] 0.8630993</code></pre>
 <pre class="r"><code class="hljs">CM</code></pre>
 <pre><code class="hljs">## Confusion Matrix and Statistics
 ## 
 ##                
 ## classifications Ale IPA
-##             Ale 170  30
-##             IPA  25  91
-##                                           
-##                Accuracy : 0.8259          
-##                  95% CI : (0.7796, 0.8661)
-##     No Information Rate : 0.6171          
-##     P-Value [Acc &gt; NIR] : 5.465e-16       
-##                                           
-##                   Kappa : 0.6288          
-##                                           
-##  Mcnemar's Test P-Value : 0.5896          
-##                                           
-##             Sensitivity : 0.8718          
-##             Specificity : 0.7521          
-##          Pos Pred Value : 0.8500          
-##          Neg Pred Value : 0.7845          
-##              Prevalence : 0.6171          
-##          Detection Rate : 0.5380          
-##    Detection Prevalence : 0.6329          
-##       Balanced Accuracy : 0.8119          
-##                                           
-##        'Positive' Class : Ale             
+##             Ale 160  23
+##             IPA  31 102
+##                                          
+##                Accuracy : 0.8291         
+##                  95% CI : (0.783, 0.8689)
+##     No Information Rate : 0.6044         
+##     P-Value [Acc &gt; NIR] : &lt;2e-16         
+##                                          
+##                   Kappa : 0.6465         
+##                                          
+##  Mcnemar's Test P-Value : 0.3408         
+##                                          
+##             Sensitivity : 0.8377         
+##             Specificity : 0.8160         
+##          Pos Pred Value : 0.8743         
+##          Neg Pred Value : 0.7669         
+##              Prevalence : 0.6044         
+##          Detection Rate : 0.5063         
+##    Detection Prevalence : 0.5791         
+##       Balanced Accuracy : 0.8268         
+##                                          
+##        'Positive' Class : Ale            
 ## </code></pre>
 </div>
-<div id="section-placeholder-for-boundary-plot" class="section level2">
-<h2><em>Placeholder for boundary plot</em></h2>
-<pre class="r"><code class="hljs"><span class="hljs-keyword">library</span>(ElemStatLearn)
-<span class="hljs-keyword">require</span>(class)</code></pre>
+<div id="section-scatter-plot-of-ale-vs-ipa-beer-styles" class="section level2">
+<h2><em>Scatter plot of Ale vs IPA beer styles</em></h2>
+<pre class="r"><code class="hljs">Percent_ABV=allAles$ABV*<span class="hljs-number">100</span>
+gg &lt;- ggplot(allAles, aes(x=ABV, y=IBU,col=styleClass)) +
+ geom_point(aes()) +
+ geom_smooth(method=<span class="hljs-string">"loess"</span>, se=<span class="hljs-literal">F</span>) +
+ labs(subtitle=<span class="hljs-string">"ABV Vs IBU"</span>,
+      y=<span class="hljs-string">"IBU"</span>,
+      x=<span class="hljs-string">"ABV"</span>,
+      title=<span class="hljs-string">"Scatterplot of Ales"</span>,
+      caption = <span class="hljs-string">"Source: Brewery Data"</span>)
+plot(gg)</code></pre>
+<p><img src="./Craft Beer Case Study_files/unnamed-chunk-26-1.png" width="672"></p>
 </div>
 </div>
 <div id="section-question-of-interest-what-are-the-most-popular-beer-styles-by-region-of-the-country." class="section level1">
@@ -831,18 +865,14 @@ neregion &lt;- allbrews%&gt;%filter(State %<span class="hljs-keyword">in</span>%
 classCount=neregion%&gt;%group_by(class)%&gt;%summarise(class_count=n())
 orderedcc&lt;-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill=<span class="hljs-string">"blue"</span>,color = <span class="hljs-string">"black"</span>, include = .northeast_region)</code></pre>
+plot_usmap(data = neregion, values = <span class="hljs-string">"IBU"</span>, color = <span class="hljs-string">"black"</span>, include = .northeast_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"IBU by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
 <p><img src="./Craft Beer Case Study_files/unnamed-chunk-27-1.png" width="672"></p>
-<pre class="r"><code class="hljs">head(orderedcc)</code></pre>
-<pre><code class="hljs">## # A tibble: 6 x 2
-##   class   class_count
-##   &lt;chr&gt;         &lt;int&gt;
-## 1 IPA              99
-## 2 ale              66
-## 3 other            47
-## 4 lager            25
-## 5 APA              23
-## 6 pilsner          22</code></pre>
+<pre class="r"><code class="hljs">plot_usmap(data = neregion, values = <span class="hljs-string">"ABV"</span>, color = <span class="hljs-string">"black"</span>, include = .northeast_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"ABV by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
+<p><img src="./Craft Beer Case Study_files/unnamed-chunk-27-2.png" width="672"></p>
 </div>
 <div id="section-midwest-region" class="section level2">
 <h2><strong>Midwest Region</strong></h2>
@@ -852,18 +882,14 @@ mwregion &lt;- allbrews%&gt;%filter(State %<span class="hljs-keyword">in</span>%
 classCount=mwregion%&gt;%group_by(class)%&gt;%summarise(class_count=n())
 orderedcc&lt;-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill=<span class="hljs-string">"blue"</span>,color = <span class="hljs-string">"black"</span>, include = .midwest_region)</code></pre>
+plot_usmap(data = mwregion, values = <span class="hljs-string">"IBU"</span>, color = <span class="hljs-string">"black"</span>, include = .midwest_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"IBU by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
 <p><img src="./Craft Beer Case Study_files/unnamed-chunk-28-1.png" width="672"></p>
-<pre class="r"><code class="hljs">head(orderedcc)</code></pre>
-<pre><code class="hljs">## # A tibble: 6 x 2
-##   class   class_count
-##   &lt;chr&gt;         &lt;int&gt;
-## 1 IPA             151
-## 2 ale             140
-## 3 other            84
-## 4 APA              64
-## 5 red ale          39
-## 6 lager            37</code></pre>
+<pre class="r"><code class="hljs">plot_usmap(data = mwregion, values = <span class="hljs-string">"ABV"</span>, color = <span class="hljs-string">"black"</span>, include = .midwest_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"ABV by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
+<p><img src="./Craft Beer Case Study_files/unnamed-chunk-28-2.png" width="672"></p>
 </div>
 <div id="section-south-region" class="section level2">
 <h2><strong>South Region</strong></h2>
@@ -872,18 +898,14 @@ sregion &lt;- allbrews%&gt;%filter(State %<span class="hljs-keyword">in</span>% 
 classCount=sregion%&gt;%group_by(class)%&gt;%summarise(class_count=n())
 orderedcc&lt;-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill=<span class="hljs-string">"blue"</span>,color = <span class="hljs-string">"black"</span>, include = .south_region)</code></pre>
+plot_usmap(data = sregion, values = <span class="hljs-string">"IBU"</span>, color = <span class="hljs-string">"black"</span>, include = .south_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"IBU by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
 <p><img src="./Craft Beer Case Study_files/unnamed-chunk-29-1.png" width="672"></p>
-<pre class="r"><code class="hljs">head(orderedcc)</code></pre>
-<pre><code class="hljs">## # A tibble: 6 x 2
-##   class      class_count
-##   &lt;chr&gt;            &lt;int&gt;
-## 1 IPA                 99
-## 2 ale                 71
-## 3 APA                 55
-## 4 other               42
-## 5 Blonde ale          29
-## 6 brown ale           21</code></pre>
+<pre class="r"><code class="hljs">plot_usmap(data = sregion, values = <span class="hljs-string">"ABV"</span>, color = <span class="hljs-string">"black"</span>, include = .south_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"ABV by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
+<p><img src="./Craft Beer Case Study_files/unnamed-chunk-29-2.png" width="672"></p>
 </div>
 <div id="section-west-region" class="section level2">
 <h2><strong>West Region</strong></h2>
@@ -892,18 +914,14 @@ wregion &lt;- allbrews%&gt;%filter(State %<span class="hljs-keyword">in</span>% 
 classCount=wregion%&gt;%group_by(class)%&gt;%summarise(class_count=n())
 orderedcc&lt;-classCount[order(-classCount$class_count),]
 
-plot_usmap(fill=<span class="hljs-string">"blue"</span>,color = <span class="hljs-string">"black"</span>, include = .west_region)</code></pre>
+plot_usmap(data = wregion, values = <span class="hljs-string">"IBU"</span>, color = <span class="hljs-string">"black"</span>, include = .west_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"IBU by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
 <p><img src="./Craft Beer Case Study_files/unnamed-chunk-30-1.png" width="672"></p>
-<pre class="r"><code class="hljs">head(orderedcc)</code></pre>
-<pre><code class="hljs">## # A tibble: 6 x 2
-##   class      class_count
-##   &lt;chr&gt;            &lt;int&gt;
-## 1 IPA                222
-## 2 ale                143
-## 3 APA                103
-## 4 red ale             67
-## 5 other               61
-## 6 Blonde ale          39</code></pre>
+<pre class="r"><code class="hljs">plot_usmap(data = wregion, values = <span class="hljs-string">"ABV"</span>, color = <span class="hljs-string">"black"</span>, include = .west_region) + 
+  scale_fill_continuous(
+    low = <span class="hljs-string">"blue"</span>, high = <span class="hljs-string">"white"</span>, name = <span class="hljs-string">"ABU by State"</span>  ) + theme(legend.position = <span class="hljs-string">"right"</span>)</code></pre>
+<p><img src="./Craft Beer Case Study_files/unnamed-chunk-30-2.png" width="672"></p>
 </div>
 </div>
 
